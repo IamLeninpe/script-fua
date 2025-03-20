@@ -28,9 +28,11 @@ def buscar_pestana_y_escribir_fecha_y_hora():
         time.sleep(0.5)
     pyautogui.typewrite(entry_dni.get())
     pyautogui.press('tab')
-    time.sleep(0.5)
+    time.sleep(1.7)
     pyautogui.press('tab')
-    time.sleep(0.5)
+    time.sleep(1.7)
+    pyautogui.press('tab')
+    time.sleep(1.7)
     pyautogui.typewrite(entry_etnia.get())
     pyautogui.press('tab')
     time.sleep(0.5)
@@ -39,9 +41,12 @@ def buscar_pestana_y_escribir_fecha_y_hora():
     time.sleep(0.5)
     pyautogui.press('tab')
     time.sleep(0.5)
-    pyautogui.press('enter')  # Primer enter
-    time.sleep(0.5)
-    pyautogui.press('enter')  # Segundo enter
+    pyautogui.press('enter')  # Presiona la tecla Enter (Intro) nuevamente
+    time.sleep(1.7)
+    pyautogui.press('tab')
+    time.sleep(1.7)
+    pyautogui.typewrite(entry_dni_prof.get())  # Escribe el DNI del profesional
+
     messagebox.showinfo("Éxito", "Datos escritos en el formulario.")
 
 def formatear_entrada(event, formato, separador, max_len, siguiente_campo=None):
@@ -98,14 +103,19 @@ entry_dni.bind("<KeyRelease>", lambda e: formatear_entrada(e, set(), "", 8, entr
 tk.Label(root, text="Etnia").pack(pady=5)
 entry_etnia = tk.Entry(root)
 entry_etnia.pack(pady=5)
-entry_etnia.insert(0, "58")  # Valor por defecto
 entry_etnia.bind("<KeyRelease>", lambda e: formatear_entrada(e, set(), "", 8, entry_cod_presta))
 
 # Campo Cod Presta
 tk.Label(root, text="Cod Prestación").pack(pady=5)
 entry_cod_presta = tk.Entry(root)
 entry_cod_presta.pack(pady=5)
-entry_cod_presta.bind("<KeyRelease>", lambda e: formatear_entrada(e, set(), "", 8))
+entry_cod_presta.bind("<KeyRelease>", lambda e: formatear_entrada(e, set(), "", 8, entry_dni_prof))
+
+# Campo DNI_PROF
+tk.Label(root, text="Ingrese el DNI del Profesional:").pack(pady=5)
+entry_dni_prof = tk.Entry(root)
+entry_dni_prof.pack(pady=5)
+entry_dni_prof.bind("<KeyRelease>", lambda e: formatear_entrada(e, set(), "", 8))
 
 # Botón Ejecutar
 tk.Button(root, text="Ejecutar", command=buscar_pestana_y_escribir_fecha_y_hora).pack(pady=20)

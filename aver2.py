@@ -1,0 +1,257 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from tkinter import messagebox, Tk, Label, Entry, Button, Radiobutton, StringVar, Frame
+from selenium.webdriver.common.action_chains import ActionChains
+from tkinter import ttk 
+import time
+
+def buscar_y_escribir_datos(fecha, hora, renipres, fua, dni, cod_presta, responsable):
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")  
+    service = Service("C:/Users/RSY/Desktop/fua-script/chromedriver.exe")  
+    driver = webdriver.Chrome(service=service, options=options)
+
+    try:
+        if "http://192.168.86.202:10088/opensis/arfsisweb/index.jsp#/registrar" not in driver.current_url:
+            messagebox.showerror("Error", "La pestaña abierta no tiene la URL esperada.")
+            return
+
+        wait = WebDriverWait(driver, 10)
+
+        # Escribir la fecha
+        fecha_input = wait.until(EC.presence_of_element_located((By.ID, "ate_fecatencion")))
+        fecha_input.clear()
+        fecha_input.send_keys(fecha)  
+        fecha_input.send_keys(Keys.TAB)
+
+        # Escribir la hora
+        hora_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[inputid='hora']")))
+        hora_input.clear()
+        hora_input.send_keys(hora)
+        hora_input.send_keys(Keys.TAB)
+
+        # Escribir RENIPRES
+        renipres_input = wait.until(EC.presence_of_element_located((By.ID, "ate_ideess")))
+        renipres_input.clear()
+        renipres_input.send_keys(renipres)
+        renipres_input.send_keys(Keys.TAB)
+
+        # Escribir FUA
+        fua_input = wait.until(EC.presence_of_element_located((By.ID, "ate_numregate")))
+        fua_input.clear()
+        fua_input.send_keys(fua)
+        fua_input.send_keys(Keys.TAB)
+
+        # Escribir DNI
+        dni_input = wait.until(EC.presence_of_element_located((By.ID, "ate_numregafiins")))
+        dni_input.clear()
+        dni_input.send_keys(dni)
+        dni_input.send_keys(Keys.TAB)
+
+        # Establecer el valor por defecto para id="ate_idetnia"
+        etnia_input = wait.until(EC.presence_of_element_located((By.ID, "ate_idetnia")))
+        etnia_input.clear()
+        etnia_input.send_keys("58")
+        etnia_input.send_keys(Keys.TAB)
+
+        # Escribir COD PRESTA
+        cod_presta_input = wait.until(EC.presence_of_element_located((By.ID, "ate_idservicio")))
+        cod_presta_input.clear()
+        cod_presta_input.send_keys(cod_presta)
+
+        # Dirigirse al elemento con class="p-dropdown-label p-inputtext tabindex"
+        modalidad_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".p-dropdown-label.p-inputtext.tabindex")))
+        actions = ActionChains(driver)
+        actions.move_to_element(modalidad_input).click()
+        actions.send_keys(Keys.ENTER).pause(1)
+        actions.send_keys(Keys.ENTER).perform()  
+
+        # Dirigirse al elemento con id="tipoDocumentoResponsable"
+        tipo_doc_responsable = wait.until(EC.presence_of_element_located((By.ID, "tipoDocumentoResponsable")))
+        actions = ActionChains(driver)
+        actions.move_to_element(tipo_doc_responsable).click()  
+        actions.send_keys(Keys.ENTER).pause(1)  
+        actions.send_keys(Keys.ENTER).perform() 
+
+        # Ingresar el campo ate_dnipersonalsalud (8 caracteres numéricos)
+        personal_salud_input = wait.until(EC.presence_of_element_located((By.ID, "ate_dnipersonalsalud")))
+        personal_salud_input.clear()
+        personal_salud_input.send_keys(responsable) 
+        dni_input.send_keys(Keys.TAB)
+
+        # Enviar Control + 3
+        actions = ActionChains(driver)
+        actions.key_down(Keys.CONTROL).send_keys("3").key_up(Keys.CONTROL).perform()
+
+        # Hacer clic en el botón con id="buttonDiagnostico"
+        button_diagnostico = wait.until(EC.presence_of_element_located((By.ID, "buttonDiagnostico")))
+        button_diagnostico.click()
+        
+        # Localizar el campo de entrada con las clases específicas
+        diagnostico_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.p-inputtext.p-component.p-inputtext-sm.p-invalid.tabindex.diagnostico")))
+        diagnostico_input.click()
+        
+        # Cambiar el valor del diagnóstico según el COD PRESTA
+        diagnostico_value = "Z742"  # Valor por defecto
+        if cod_presta == "022":
+            diagnostico_value = "Z133"  # Cambiar a Z133 si COD PRESTA es 022
+        
+        diagnostico_input.send_keys(diagnostico_value)
+        dni_input.send_keys(Keys.TAB)
+
+        # Enviar Control + 6
+        actions = ActionChains(driver)
+        actions.key_down(Keys.CONTROL).send_keys("6").key_up(Keys.CONTROL).perform()
+        
+        # Hacer clic en el botón con id="plusProcedimiento"
+        button_diagnostico = wait.until(EC.presence_of_element_located((By.ID, "plusProcedimiento")))
+        button_diagnostico.click()
+        
+        # Localizar el campo de entrada con las clases específicas
+        procedimiento_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.p-inputtext.p-component.p-invalid.p-inputtext-sm.tabindex.procedimiento")))
+        procedimiento_input.click()
+        
+        # Cambiar el valor del procedimiento según el COD PRESTA
+        procedimiento_value = "99509"  # Valor por defecto
+        if cod_presta == "022":
+            procedimiento_value = "99207"  # Cambiar a 99207 si COD PRESTA es 022
+        
+        procedimiento_input.send_keys(procedimiento_value)
+        procedimiento_input.send_keys(Keys.TAB)
+
+        # Escribir el número 1 en el campo activo 1
+        ActionChains(driver).send_keys("1").perform()
+        ActionChains(driver).send_keys(Keys.TAB).perform()
+        time.sleep(0.7)
+        
+        # Escribir el número 1 en el campo activo 2
+        ActionChains(driver).send_keys("1").perform()
+        ActionChains(driver).send_keys(Keys.TAB).perform()
+        time.sleep(0.7)
+        
+        # Escribir el número 1 en el campo activo 3
+        ActionChains(driver).send_keys("1").perform()
+        ActionChains(driver).send_keys(Keys.TAB).perform()
+        ActionChains(driver).send_keys(Keys.TAB).perform()
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error: {e}")
+
+    finally:
+        driver.quit()
+
+def formatear_entrada(event, posiciones, separador, max_length, siguiente_campo=None):
+    """Formatea la entrada del campo automáticamente."""
+    widget = event.widget
+    texto = widget.get()
+    if len(texto) > max_length:
+        widget.delete(max_length, "end")
+        return
+    for pos in posiciones:
+        if len(texto) == pos and texto[-1] != separador:
+            widget.insert(pos, separador)
+    if len(texto) == max_length and siguiente_campo:
+        siguiente_campo.focus()
+
+def iniciar_programa():
+    """Obtiene los datos ingresados en la interfaz y ejecuta la función principal."""
+    fecha = entry_fecha.get()
+    hora = entry_hora.get()
+    renipres = entry_renipres.get()
+    fua = entry_fua.get()
+    dni = entry_dni.get()
+    cod_presta = cod_presta_var.get()  # Obtener el valor seleccionado de los RadioButtons
+    responsable = entry_responsable.get()
+    if not fecha or not hora or not renipres or not fua or not dni or not cod_presta or not responsable:
+        messagebox.showerror("Error", "Por favor, completa todos los campos.")
+        return
+    buscar_y_escribir_datos(fecha, hora, renipres, fua, dni, cod_presta, responsable)
+
+# Interfaz gráfica con tkinter
+root = Tk()
+root.title("Ingreso de Datos")
+
+# Tamaño de la ventana
+window_width = 350
+window_height = 300
+
+# Obtener el tamaño de la pantalla
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+# Calcular la posición para centrar la ventana
+position_x = (screen_width - window_width) // 2
+position_y = (screen_height - window_height) // 2
+
+# Establecer el tamaño y la posición de la ventana
+root.geometry(f"{window_width}x{window_height}+{position_x}+{position_y}")
+root.resizable(False, False)  # Evitar que la ventana sea redimensionable
+
+# Estilo moderno con ttk
+style = ttk.Style()
+style.configure("TLabel", font=("Arial", 10), padding=5)
+style.configure("TEntry", font=("Arial", 10), padding=5)
+style.configure("TButton", font=("Arial", 10), padding=5)
+style.configure("TRadiobutton", font=("Arial", 10), padding=5)
+
+# Crear un frame principal para organizar los elementos
+main_frame = ttk.Frame(root, padding="10")
+main_frame.pack(fill="both", expand=True)
+
+# Campo Fecha
+ttk.Label(main_frame, text="Ingrese la fecha (DD/MM):").grid(row=0, column=0, sticky="w", pady=5)
+entry_fecha = ttk.Entry(main_frame)
+entry_fecha.grid(row=0, column=1, sticky="ew", pady=5)
+entry_fecha.focus()
+entry_fecha.bind("<KeyRelease>", lambda e: formatear_entrada(e, {2}, "/", 5))
+
+# Campo Hora
+ttk.Label(main_frame, text="Ingrese la hora (HH:MM):").grid(row=1, column=0, sticky="w", pady=5)
+entry_hora = ttk.Entry(main_frame)
+entry_hora.grid(row=1, column=1, sticky="ew", pady=5)
+entry_hora.bind("<KeyRelease>", lambda e: formatear_entrada(e, {2}, ":", 5))
+
+# Campo RENIPRES
+ttk.Label(main_frame, text="Ingrese el RENIPRES:").grid(row=2, column=0, sticky="w", pady=5)
+entry_renipres = ttk.Entry(main_frame)
+entry_renipres.grid(row=2, column=1, sticky="ew", pady=5)
+
+# Campo FUA
+ttk.Label(main_frame, text="Ingrese el FUA:").grid(row=3, column=0, sticky="w", pady=5)
+entry_fua = ttk.Entry(main_frame)
+entry_fua.grid(row=3, column=1, sticky="ew", pady=5)
+
+# Campo DNI
+ttk.Label(main_frame, text="Ingrese el DNI:").grid(row=4, column=0, sticky="w", pady=5)
+entry_dni = ttk.Entry(main_frame)
+entry_dni.grid(row=4, column=1, sticky="ew", pady=5)
+
+# Campo COD PRESTA (usando RadioButtons)
+ttk.Label(main_frame, text="Seleccione el COD PRESTA:").grid(row=5, column=0, sticky="w", pady=5)
+cod_presta_var = StringVar(value="016")  # Valor por defecto
+
+# Crear un Frame para los Radiobuttons
+frame_cod_presta = ttk.Frame(main_frame)
+frame_cod_presta.grid(row=5, column=1, sticky="ew", pady=5)
+
+# Radiobuttons dentro del Frame
+ttk.Radiobutton(frame_cod_presta, text="022", variable=cod_presta_var, value="022").pack(side="left", padx=10)
+ttk.Radiobutton(frame_cod_presta, text="075", variable=cod_presta_var, value="075").pack(side="left", padx=10)
+
+# Campo Responsable
+ttk.Label(main_frame, text="Responsable:").grid(row=6, column=0, sticky="w", pady=5)
+entry_responsable = ttk.Entry(main_frame)
+entry_responsable.grid(row=6, column=1, sticky="ew", pady=5)
+
+# Botón para ejecutar
+btn_ejecutar = ttk.Button(main_frame, text="Ejecutar", command=iniciar_programa)
+btn_ejecutar.grid(row=7, column=0, columnspan=2, pady=10)
+
+# Ajustar el peso de las columnas para que los campos se expandan correctamente
+main_frame.columnconfigure(1, weight=1)
+
+root.mainloop()

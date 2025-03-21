@@ -80,7 +80,7 @@ def buscar_y_escribir_datos(fecha, hora, renipres, fua, dni, cod_presta, respons
             button_preventivo = wait.until(EC.presence_of_element_located((By.ID, "plusPreventivo")))
             button_preventivo.click()
             preventivo_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.p-inputtext.p-component.p-inputtext-sm.p-invalid.p-inputtext-sm.tabindex.preventivo")))
-            preventivo_input.send_keys("407")  # Removed Keys.TAB before sending "407"
+            preventivo_input.send_keys("407")  
             actions.send_keys(Keys.TAB).perform()
 
             valor_element = wait.until(EC.presence_of_element_located((By.ID, "valor407-1")))
@@ -92,7 +92,7 @@ def buscar_y_escribir_datos(fecha, hora, renipres, fua, dni, cod_presta, respons
         button_diagnostico = wait.until(EC.presence_of_element_located((By.ID, "buttonDiagnostico")))
         button_diagnostico.click()
 
-        empty_area = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))  # Adjust selector if needed
+        empty_area = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "body"))) 
         actions.move_to_element(empty_area).click().perform()
 
         diagnostico_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.p-inputtext.p-component.p-inputtext-sm.p-invalid.tabindex.diagnostico")))

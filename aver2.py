@@ -56,10 +56,12 @@ def buscar_y_escribir_datos(fecha, hora, renipres, fua, dni, cod_presta, respons
         cod_presta_input.clear()
         cod_presta_input.send_keys(cod_presta)
 
-        modalidad_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".p-dropdown-label.p-inputtext.tabindex")))
+        modalidad_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".p-dropdown-label.p-inputtext.tabindex.p-placeholder")))
         actions = ActionChains(driver)
         actions.move_to_element(modalidad_input).click()
         actions.send_keys(Keys.ENTER).pause(1)
+        actions.send_keys(Keys.ARROW_DOWN).pause(1)
+        actions.send_keys(Keys.ARROW_DOWN).pause(1) 
         actions.send_keys(Keys.ENTER).perform()
 
         tipo_doc_responsable = wait.until(EC.presence_of_element_located((By.ID, "tipoDocumentoResponsable")))
@@ -73,11 +75,25 @@ def buscar_y_escribir_datos(fecha, hora, renipres, fua, dni, cod_presta, respons
         personal_salud_input.send_keys(responsable)
         dni_input.send_keys(Keys.TAB)
 
-        actions = ActionChains(driver)
+        if cod_presta == "022":
+            actions.key_down(Keys.CONTROL).send_keys("2").key_up(Keys.CONTROL).perform()
+            button_preventivo = wait.until(EC.presence_of_element_located((By.ID, "plusPreventivo")))
+            button_preventivo.click()
+            preventivo_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.p-inputtext.p-component.p-inputtext-sm.p-invalid.p-inputtext-sm.tabindex.preventivo")))
+            preventivo_input.send_keys("407")  # Removed Keys.TAB before sending "407"
+            actions.send_keys(Keys.TAB).perform()
+
+            valor_element = wait.until(EC.presence_of_element_located((By.ID, "valor407-1")))
+            actions.move_to_element(valor_element).click().perform()
+            actions.send_keys(Keys.ENTER).perform()
+
         actions.key_down(Keys.CONTROL).send_keys("3").key_up(Keys.CONTROL).perform()
 
         button_diagnostico = wait.until(EC.presence_of_element_located((By.ID, "buttonDiagnostico")))
         button_diagnostico.click()
+
+        empty_area = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))  # Adjust selector if needed
+        actions.move_to_element(empty_area).click().perform()
 
         diagnostico_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.p-inputtext.p-component.p-inputtext-sm.p-invalid.tabindex.diagnostico")))
         diagnostico_input.click()
@@ -150,7 +166,7 @@ root = Tk()
 root.title("Ingreso de Datos")
 
 window_width = 350
-window_height = 300
+window_height = 350
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()

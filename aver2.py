@@ -16,7 +16,7 @@ def buscar_y_escribir_datos(fecha, hora, renipres, fua, dni, cod_presta, respons
     driver = webdriver.Chrome(service=service, options=options)
 
     try:
-        if "http://192.168.86.202:10088/opensis/arfsisweb/index.jsp#/registrar" not in driver.current_url:
+        if "http://192.168.86.210:10088/opensis/arfsisweb/index.jsp#/registrar" not in driver.current_url:
             messagebox.showerror("Error", "La pestaña abierta no tiene la URL esperada.")
             return
 
@@ -115,7 +115,7 @@ def buscar_y_escribir_datos(fecha, hora, renipres, fua, dni, cod_presta, respons
 
         procedimiento_value = "99509"
         if cod_presta == "022":
-            procedimiento_value = "99207"
+            procedimiento_value = "99402.09"
         procedimiento_input.send_keys(procedimiento_value)
         procedimiento_input.send_keys(Keys.TAB)
 
